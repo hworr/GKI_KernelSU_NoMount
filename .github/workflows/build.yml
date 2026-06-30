@@ -31,10 +31,6 @@ on:
         required: false
         type: string
         default: ""
-      susfs_commit:
-        required: false
-        type: string
-        default: ""
 
 jobs:
   build-gki:
@@ -136,20 +132,16 @@ jobs:
       with:
         ksu_branch: ${{ inputs.ksu_branch }}
 
-    - name: SUSFS
-      if: contains(inputs.feature_set, 'SUSFS') || inputs.feature_set == 'FULL'
-      uses: ./.github/actions/susfs
-      with:
-        susfs_commit: ${{ inputs.susfs_commit }}
-        version: ${{ inputs.version }}
-        android_version: ${{ inputs.android_version }}
-        kernel_version: ${{ inputs.kernel_version }}
-        os_patch_level: ${{ inputs.os_patch_level }}
-        sublevel: ${{ steps.extract.outputs.sublevel }}
-
     - name: Baseband Guard
       if: (contains(inputs.feature_set, 'BBG') || inputs.feature_set == 'FULL')
       uses: ./.github/actions/bbg
+
+    - name: NoMount
+      if: contains(inputs.feature_set, 'NOMOUNT') || inputs.feature_set == 'FULL'
+      uses: ./.github/actions/nomount
+      with:
+        version: ${{ inputs.version }}
+        kernel_version: ${{ inputs.kernel_version }}
 
     - name: Setup Networking
       if: contains(inputs.feature_set, 'NET') || inputs.feature_set == 'FULL'
@@ -383,12 +375,6 @@ jobs:
         KSU_VER="${KSU_VERSION:-N/A}"
         KSU_TAG="${KSU_GIT_TAG:-N/A}"
         
-        # Get SUSFS version from susfs.h if available
-        SUSFS_VER="N/A"
-        if [ -f "${{ github.workspace }}/kernel/common/include/linux/susfs.h" ]; then
-          SUSFS_VER=$(grep '#define SUSFS_VERSION' "${{ github.workspace }}/kernel/common/include/linux/susfs.h" | awk -F'"' '{print $2}' || echo "N/A")
-        fi
-        
         # Get cache stats from env (set by cache-stats action)
         CCACHE_HIT="${CCACHE_HIT_RATE:-N/A}"
         
@@ -410,7 +396,13 @@ jobs:
           fi
           echo "| **KSU Version** | ${KSU_VER} |"
           echo "| **KSU Tag** | ${KSU_TAG} |"
-          echo "| **SUSFS Version** | ${SUSFS_VER} |"
+
+          # Get NoMount version from nomount.h if available
+          NOMOUNT_VER="N/A"
+          if [ -f "${{ github.workspace }}/kernel/common/fs/nomount.h" ]; then
+            NOMOUNT_VER=$(grep '#define NOMOUNT_VERSION' "${{ github.workspace }}/kernel/common/fs/nomount.h" | awk '{print $3}' || echo "N/A")
+          fi
+          echo "| **NoMount Version** | ${NOMOUNT_VER} |"
           echo "| **Feature Set** | ${{ inputs.feature_set }} |"
           echo "| **Variant** | ${{ inputs.variant }} |"
           echo

@@ -16,11 +16,6 @@ on:
         required: false
         type: string
         default: ""
-      susfs_commit:
-        description: "SUSFS commit hash (empty = latest on auto-derived branch)"
-        required: false
-        type: string
-        default: ""
 
 jobs:
   generate-matrix:
@@ -93,5 +88,4 @@ jobs:
       variant: ${{ matrix.variant }}
       feature_set: ${{ inputs.feature_set }}
       ksu_branch: ${{ inputs.ksu_branch }}
-      susfs_commit: ${{ inputs.susfs_commit }}
     secrets: inherit
