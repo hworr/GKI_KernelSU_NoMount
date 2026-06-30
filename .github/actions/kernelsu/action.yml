@@ -83,6 +83,13 @@ runs:
         cp ${{ github.action_path }}/patches/static.patch "${{ github.workspace }}/kernel/KernelSU/static.patch"
         patch -p1 < static.patch
 
+        # The patch above changes only forward declarations to non-static.
+        # KOWX712's fork also has static on the actual function definitions,
+        # which must match the forward declarations.
+        sed -i '/^static int security_context_to_sid_with_policy/s/^static int /int /' kernel/feature/selinux_hide.c
+        sed -i '/^static int security_sid_to_context_with_policy/s/^static int /int /' kernel/feature/selinux_hide.c
+        sed -i '/^static void __nocfi security_compute_av_user_with_policy/s/^static void __nocfi /void __nocfi /' kernel/feature/selinux_hide.c
+
     - name: Enable Kernel Configs
       uses: ./.github/actions/set-kernel-config
       with:
