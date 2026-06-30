@@ -30,6 +30,22 @@ runs:
         echo "patch_ver=$PATCH_VER" >> $GITHUB_OUTPUT
         echo "Selected NoMount patch for kernel $KERNEL_VER"
 
+    - name: Fetch NoMount Source Files
+      shell: bash
+      run: |
+        NOMOUNT_DIR="${{ github.workspace }}/nomount"
+        if [ -f "$NOMOUNT_DIR/kernel/src/nomount.c" ]; then
+          echo "NoMount files already present locally"
+          exit 0
+        fi
+        mkdir -p "$NOMOUNT_DIR"
+        cd "$NOMOUNT_DIR"
+        git init
+        git remote add origin https://github.com/maxsteeel/nomount.git
+        git fetch --depth=1 origin master
+        git checkout -b master FETCH_HEAD
+        echo "Fetched NoMount from GitHub"
+
     - name: Copy NoMount Source Files
       shell: bash
       working-directory: ${{ github.workspace }}/kernel/common
