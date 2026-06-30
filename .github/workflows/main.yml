@@ -93,7 +93,6 @@ jobs:
       config_file: .github/config/android12-5.10.json
       feature_set: ${{ inputs.feature_set || 'FULL' }}
       ksu_branch: ${{ inputs.ksu_branch }}
-      susfs_commit: ${{ inputs.susfs_commit_android12-5-10 }}
     secrets: inherit
 
   build-android13-5-10:
