@@ -467,22 +467,22 @@ jobs:
       run: |
         set -euo pipefail
 
-        KSU_REPO="https://github.com/pershoot/KernelSU-Next.git"
+        KSU_REPO="https://github.com/KOWX712/KernelSU.git"
         KSU_INPUT="${{ inputs.ksu_branch }}"
         if [ -z "$KSU_INPUT" ]; then
-          KSU_INPUT="dev-susfs"
+          KSU_INPUT="master"
         fi
 
         # Try as branch first, fall back to commit
         if git ls-remote --heads "$KSU_REPO" "$KSU_INPUT" | grep -q .; then
-          echo "Cloning KernelSU-Next from branch: $KSU_INPUT"
-          git clone --branch "$KSU_INPUT" "$KSU_REPO" /tmp/kernelsu-next
-          cd /tmp/kernelsu-next
+          echo "Cloning KernelSU from branch: $KSU_INPUT"
+          git clone --branch "$KSU_INPUT" "$KSU_REPO" /tmp/kernelsu
+          cd /tmp/kernelsu
           KSUN_COMMIT=$(git rev-parse HEAD)
         else
-          echo "Cloning KernelSU-Next from dev-susfs branch, then checking out commit: $KSU_INPUT"
-          git clone --branch dev-susfs "$KSU_REPO" /tmp/kernelsu-next
-          cd /tmp/kernelsu-next
+          echo "Cloning KernelSU from master branch, then checking out commit: $KSU_INPUT"
+          git clone --branch master "$KSU_REPO" /tmp/kernelsu
+          cd /tmp/kernelsu
           git fetch --depth=50 origin "$KSU_INPUT"
           git checkout "$KSU_INPUT"
           KSUN_COMMIT="$KSU_INPUT"
@@ -496,11 +496,11 @@ jobs:
         # Extract git tag
         KSU_GIT_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "no-tag")
 
-        MANAGER_RUN_ID=$(curl -fsSL "https://api.github.com/repos/pershoot/KernelSU-Next/actions/workflows/build-manager-ci.yml/runs?head_sha=${KSUN_COMMIT}" | jq -r '.workflow_runs[0].id // empty')
+        MANAGER_RUN_ID=$(curl -fsSL "https://api.github.com/repos/KOWX712/KernelSU/actions/workflows/build-manager-ci.yml/runs?head_sha=${KSUN_COMMIT}" | jq -r '.workflow_runs[0].id // empty')
         if [[ -n "${MANAGER_RUN_ID:-}" ]]; then
-          KSU_MANAGER="https://github.com/pershoot/KernelSU-Next/actions/runs/${MANAGER_RUN_ID}"
+          KSU_MANAGER="https://github.com/KOWX712/KernelSU/actions/runs/${MANAGER_RUN_ID}"
         else
-          KSU_MANAGER="https://github.com/pershoot/KernelSU-Next/actions/workflows/build-manager-ci.yml"
+          KSU_MANAGER="https://github.com/KOWX712/KernelSU/actions/workflows/build-manager-ci.yml"
         fi
 
         echo "Commits count: $COMMITS_COUNT"
@@ -509,7 +509,7 @@ jobs:
         echo "KSU Manager: $KSU_MANAGER"
 
         # Export as environment for next step
-        echo "KSUN_BRANCH=$KSUN_BRANCH" >> $GITHUB_ENV
+        echo "KSUN_BRANCH=$KSU_INPUT" >> $GITHUB_ENV
         echo "KSUN_COMMIT=$KSUN_COMMIT" >> $GITHUB_ENV
         echo "KSU_COMMITS_COUNT=$COMMITS_COUNT" >> $GITHUB_ENV
         echo "KSU_VERSION=$KSU_VERSION" >> $GITHUB_ENV
