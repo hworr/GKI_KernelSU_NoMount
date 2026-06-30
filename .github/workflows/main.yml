@@ -32,6 +32,16 @@ on:
         description: "Feature Set"
         type: choice
         options:
+          - KSUN+SUSFS+BBG+NET+DS+NOMOUNT
+          - KSUN+SUSFS+BBG+NOMOUNT
+          - KSUN+SUSFS+NET+NOMOUNT
+          - KSUN+SUSFS+DS+NOMOUNT
+          - KSUN+SUSFS+NOMOUNT
+          - KSUN+SUSFS+BBG+NET+DS
+          - KSUN+SUSFS+BBG
+          - KSUN+SUSFS+NET
+          - KSUN+SUSFS+DS
+          - KSUN+SUSFS
           - KSUN+BBG+NET+DS+NOMOUNT
           - KSUN+BBG+NOMOUNT
           - KSUN+NET+NOMOUNT
@@ -48,6 +58,11 @@ on:
         default: FULL
       ksu_branch:
         description: "KernelSU branch or commit (empty = latest dev branch tip)"
+        type: string
+        required: false
+        default: ""
+      susfs_commit:
+        description: "SUSFS commit hash (empty = latest on auto-derived gki-{version} branch)"
         type: string
         required: false
         default: ""
@@ -93,6 +108,7 @@ jobs:
       config_file: .github/config/android12-5.10.json
       feature_set: ${{ inputs.feature_set || 'FULL' }}
       ksu_branch: ${{ inputs.ksu_branch }}
+      susfs_commit: ${{ inputs.susfs_commit }}
     secrets: inherit
 
   build-android13-5-10:
@@ -103,6 +119,7 @@ jobs:
       config_file: .github/config/android13-5.10.json
       feature_set: ${{ inputs.feature_set || 'FULL' }}
       ksu_branch: ${{ inputs.ksu_branch }}
+      susfs_commit: ${{ inputs.susfs_commit }}
     secrets: inherit
 
   build-android13-5-15:
@@ -113,6 +130,7 @@ jobs:
       config_file: .github/config/android13-5.15.json
       feature_set: ${{ inputs.feature_set || 'FULL' }}
       ksu_branch: ${{ inputs.ksu_branch }}
+      susfs_commit: ${{ inputs.susfs_commit }}
     secrets: inherit
 
   build-android14-5-15:
@@ -123,6 +141,7 @@ jobs:
       config_file: .github/config/android14-5.15.json
       feature_set: ${{ inputs.feature_set || 'FULL' }}
       ksu_branch: ${{ inputs.ksu_branch }}
+      susfs_commit: ${{ inputs.susfs_commit }}
     secrets: inherit
 
   build-android14-6-1:
@@ -133,6 +152,7 @@ jobs:
       config_file: .github/config/android14-6.1.json
       feature_set: ${{ inputs.feature_set || 'FULL' }}
       ksu_branch: ${{ inputs.ksu_branch }}
+      susfs_commit: ${{ inputs.susfs_commit }}
     secrets: inherit
 
   build-android15-6-6:
@@ -143,6 +163,7 @@ jobs:
       config_file: .github/config/android15-6.6.json
       feature_set: ${{ inputs.feature_set || 'FULL' }}
       ksu_branch: ${{ inputs.ksu_branch }}
+      susfs_commit: ${{ inputs.susfs_commit }}
     secrets: inherit
 
   build-android16-6-12:
@@ -153,6 +174,7 @@ jobs:
       config_file: .github/config/android16-6.12.json
       feature_set: ${{ inputs.feature_set || 'FULL' }}
       ksu_branch: ${{ inputs.ksu_branch }}
+      susfs_commit: ${{ inputs.susfs_commit }}
     secrets: inherit
 
   rej:
@@ -271,6 +293,7 @@ jobs:
           echo
           echo "**Feature Set:** ${{ inputs.feature_set }}"
           echo "**KSU Branch:** ${{ inputs.ksu_branch || 'latest dev' }}"
+          echo "**SUSFS Commit:** ${{ inputs.susfs_commit || 'latest' }}"
           echo
           
           # Count successes and failures
