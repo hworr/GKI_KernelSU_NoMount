@@ -34,7 +34,20 @@ runs:
 
         echo "Preparing SUSFS for branch: $SUSFS_BRANCH"
         echo "Cloning latest from $SUSFS_BRANCH..."
-        git clone "$SUSFS_REPO" -b "$SUSFS_BRANCH" susfs4ksu
+
+        ok=0
+        for attempt in 1 2 3 4 5; do
+          if git clone "$SUSFS_REPO" -b "$SUSFS_BRANCH" susfs4ksu 2>/dev/null; then
+            ok=1
+            break
+          fi
+          echo "Clone attempt $attempt failed (GitLab load); backing off..."
+          sleep $(( attempt * 10 ))
+        done
+        if [ "$ok" != 1 ]; then
+          echo "ERROR: Failed to clone SUSFS repo after 5 attempts"
+          exit 1
+        fi
 
         if [ -n "${{ inputs.susfs_commit }}" ]; then
           echo "Checking out SUSFS commit: ${{ inputs.susfs_commit }}"
